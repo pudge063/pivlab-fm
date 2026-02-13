@@ -1,0 +1,33 @@
+services:
+  fm-server:
+    build: .
+    container_name: fm-server
+    restart: unless-stopped
+    volumes:
+      - ./library:/library
+    environment:
+      - MUSIC_PATH=/library/music
+      - DB_PATH=/library/data/music.db
+    networks:
+      - pivlab-network
+    ports:
+      - "8000:8000"
+
+  fm-client:
+    build:
+      context: ./fm_client
+      dockerfile: Dockerfile
+    container_name: fm-client
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./fm_client/src:/usr/share/nginx/html/static
+    depends_on:
+      - fm-server
+    networks:
+      - pivlab-network
+
+networks:
+  pivlab-network:
+    driver: bridge

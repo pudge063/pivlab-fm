@@ -1,0 +1,19 @@
+stages:
+  - jobs
+
+.base_job:
+  tags: [immortal]
+  before_script:
+    - poetry install --no-root && . .venv/bin/activate
+
+pre-commit:
+  variables:
+    FORCE_COLOR: 1
+    PY_COLORS: 1
+    CLICOLOR_FORCE: 1
+    PRE_COMMIT_COLOR: always
+  image: af.headoffice.pivlab:6005/pre-commit:6.0.0
+  extends: [.base_job]
+  stage: jobs
+  script:
+    - pre-commit run -a -v

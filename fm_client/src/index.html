@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pivlab FM</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <div class="player">
+        <div class="header">
+            <h1>🎵 Pivlab FM</h1>
+            <button class="scan-btn" id="scanBtn">↻</button>
+        </div>
+
+        <div class="track-info" id="trackInfo">
+            <div class="no-track">OFF</div>
+        </div>
+
+        <div class="controls">
+            <button class="control-btn" id="dislikeBtn" disabled>👎</button>
+            <button class="control-btn" id="prevBtn" disabled>⏮</button>
+            <button class="control-btn" id="playBtn">▶</button>
+            <button class="control-btn" id="nextBtn" disabled>⏭</button>
+            <button class="control-btn" id="likeBtn" disabled>♡</button>
+        </div>
+
+        <div class="volume-container">
+            <span class="volume-icon" id="volumeIcon">🔊</span>
+            <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="70">
+            <span class="volume-percent" id="volumePercent">70%</span>
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="time-info">
+                <span id="currentTime">0:00</span>
+                <span id="duration">0:00</span>
+            </div>
+        </div>
+
+        <div class="tracks-header">
+            <button class="toggle-tracks-btn" id="toggleTracksBtn">Список треков</button>
+            <div class="search-container" id="searchContainer" style="display: none;">
+                <input type="text" class="search-input" id="searchInput" placeholder="Поиск треков...">
+            </div>
+        </div>
+
+        <div class="tracks-list" id="tracksContainer" style="display: none;"></div>
+
+        <div class="footer">
+            <span id="trackCount">0</span> треков
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/player.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/app.js"></script>
+</body>
+
+</html>
