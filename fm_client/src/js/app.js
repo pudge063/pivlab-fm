@@ -126,6 +126,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const searchContainer = document.getElementById('searchContainer');
     const tracksContainer = document.getElementById('tracksContainer');
     const searchInput = document.getElementById('searchInput');
+    const footer = document.getElementById('footer');
 
     let isTracksVisible = false;
     let tracksLoaded = false;
@@ -150,11 +151,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             tracksContainer.style.display = 'block';
             searchContainer.style.display = 'block';
+            footer.style.display = 'block';
             toggleTracksBtn.classList.add('active');
             toggleTracksBtn.textContent = 'Скрыть список';
         } else {
             tracksContainer.style.display = 'none';
             searchContainer.style.display = 'none';
+            footer.style.display = 'none';
             toggleTracksBtn.classList.remove('active');
             toggleTracksBtn.textContent = 'Список треков';
         }
