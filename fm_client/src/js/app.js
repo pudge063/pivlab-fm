@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    // Инициализация
     const player = new Player();
     let tracks = [];
 
@@ -7,19 +6,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     const volumePercent = document.getElementById('volumePercent');
     const volumeIcon = document.getElementById('volumeIcon');
 
-    // Установка начальной громкости через метод плеера
     player.setVolume(volumeSlider.value);
 
     volumeSlider.addEventListener('input', (e) => {
         const value = e.target.value;
 
-        // Используем метод плеера для изменения громкости
         player.setVolume(value);
 
-        // Обновляем UI
         volumePercent.textContent = value + '%';
 
-        // Меняем иконку
         if (value == 0) {
             volumeIcon.textContent = '🔇';
         } else if (value < 30) {
@@ -31,7 +26,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // Загрузка треков
+    // load tracks list
     async function loadTracks() {
         try {
             tracks = await API.getTracks();
@@ -42,7 +37,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // Воспроизведение следующего трека
+    // next track
     async function playNextTrack() {
         try {
             const track = await API.getNextTrack();
@@ -55,7 +50,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // Обработчики плеера
+    // listener for player
     player.onTimeUpdate = (currentTime, duration) => {
         UI.updateProgress(currentTime, duration);
     };
@@ -73,7 +68,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         UI.setRatingButtonsEnabled(true);
     };
 
-    // Обработчики событий интерфейса
+    // listener UI
     UI.elements.playBtn.addEventListener('click', () => {
         if (!player.currentTrack) {
             playNextTrack();
@@ -163,7 +158,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // Поиск по трекам
+    // search
     searchInput.addEventListener('input', (e) => {
         const searchTerm = e.target.value.toLowerCase();
 
@@ -189,7 +184,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             const result = await API.likeTrack(player.currentTrack.id);
             UI.updateRating(result.rating);
 
-            // Обновляем рейтинг в массиве tracks
             const trackIndex = tracks.findIndex(t => t.id === result.id);
             if (trackIndex !== -1) {
                 tracks[trackIndex].rating = result.rating;
@@ -210,7 +204,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             const result = await API.dislikeTrack(player.currentTrack.id);
             UI.updateRating(result.rating);
 
-            // Обновляем рейтинг в массиве tracks
             const trackIndex = tracks.findIndex(t => t.id === result.id);
             if (trackIndex !== -1) {
                 tracks[trackIndex].rating = result.rating;
@@ -221,6 +214,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         playNextTrack();
     });
 
-    // Начальная загрузка
+    // initial tracks load
     // await loadTracks();
 });

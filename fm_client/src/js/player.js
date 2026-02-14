@@ -4,7 +4,6 @@ class Player {
         this.currentTrack = null;
         this.isPlaying = false;
 
-        // Привязываем обработчики
         this.handleTimeUpdate = this.handleTimeUpdate.bind(this);
         this.handleEnded = this.handleEnded.bind(this);
         this.handlePlay = this.handlePlay.bind(this);
@@ -14,7 +13,6 @@ class Player {
     }
 
     setVolume(value) {
-        // value от 0 до 100
         this.audio.volume = value / 100;
     }
 

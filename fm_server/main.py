@@ -24,6 +24,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+unique_counter = 0
+
 # app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
@@ -123,9 +125,22 @@ async def stream_track(track_id: int, request: Request):
 
 @app.get("/api/next")
 def get_next_track() -> dict[str, Any]:
+    global unique_counter
+    unique_counter += 1
+
     db = SessionLocal()
     try:
-        tracks: list[Music] = db.query(Music).all()
+        if unique_counter % 8 == 0:
+            unplayed_tracks: list[Music] = (
+                db.query(Music).filter(Music.last_played.is_(None)).all()
+            )
+
+            if unplayed_tracks:
+                tracks = unplayed_tracks
+            else:
+                tracks = db.query(Music).all()
+        else:
+            tracks = db.query(Music).all()
 
         if not tracks:
             raise HTTPException(
