@@ -169,8 +169,11 @@ def get_next_track() -> dict[str, Any]:
 
         # track: Music = random.choice(tracks)  # type: ignore
 
-        track.play_count = (track.play_count or 0) + 1  # type: ignore
-        track.last_played = datetime.now()  # type: ignore
+        if track.play_count == 0:
+            unique_counter = 0
+
+        track.play_count = (track.play_count or 0) + 1
+        track.last_played = datetime.now()
 
         db.commit()
         db.refresh(track)
