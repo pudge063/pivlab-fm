@@ -46,12 +46,8 @@ Place your audio files in the `library/` directory:
 ```
 pivlab-fm/
 └── library/          # Mount point for music files
-    ├── artist1/
-    │   ├── song1.mp3
-    │   └── song2.flac
-    └── artist2/
-        └── album/
-            └── track.ogg
+    ├── song_name1 - artist_name1.mp3
+    └── song_name2 - artist_name2.mp3
 ```
 
 Supported formats: MP3, FLAC, M4A, OGG, WAV
