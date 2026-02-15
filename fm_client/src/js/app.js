@@ -2,6 +2,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     const player = new Player();
     let tracks = [];
 
+    if ('mediaSession' in navigator) {
+        navigator.mediaSession.setActionHandler('previoustrack', () => {
+            document.getElementById('prevBtn').click();
+        });
+
+        navigator.mediaSession.setActionHandler('nexttrack', () => {
+            document.getElementById('nextBtn').click();
+        });
+    }
+
     const volumeSlider = document.getElementById('volumeSlider');
     const volumePercent = document.getElementById('volumePercent');
     const volumeIcon = document.getElementById('volumeIcon');

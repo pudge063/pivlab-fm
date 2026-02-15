@@ -56,6 +56,13 @@ class Player {
         this.audio.src = API.getStreamUrl(track.id);
         await this.audio.play();
 
+        if ('mediaSession' in navigator) {
+            navigator.mediaSession.metadata = new MediaMetadata({
+                title: track.title || 'Unknown',
+                artist: track.artist || 'Unknown',
+            });
+        }
+
         if (this.onTrackChange) {
             this.onTrackChange(track);
         }
