@@ -1,17 +1,13 @@
 const API = {
-    async getTracks(category = '') {
-        const url = category 
-            ? `/api/tracks?category=${encodeURIComponent(category)}`
-            : '/api/tracks';
+    async getTracks() {
+        const url = '/api/tracks';
         const response = await fetch(url);
         if (!response.ok) throw new Error('Failed to fetch tracks');
         return await response.json();
     },
 
-    async getNextTrack(category = '') {
-        const url = category
-            ? `/api/next?category=${encodeURIComponent(category)}`
-            : '/api/next';
+    async getNextTrack() {
+        const url = '/api/next';
         const response = await fetch(url);
         if (!response.ok) throw new Error('Failed to fetch next track');
         return await response.json();

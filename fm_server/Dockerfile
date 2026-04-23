@@ -15,6 +15,6 @@ RUN poetry config virtualenvs.create false
 
 RUN poetry install --no-interaction --no-ansi --no-root
 
-COPY ./fm_server ./fm_server
+COPY ./fm_server_app ./fm_server
 
 CMD ["uvicorn", "fm_server.main:app", "--host", "0.0.0.0", "--port", "8000"]

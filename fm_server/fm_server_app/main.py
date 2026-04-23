@@ -10,6 +10,7 @@ from typing_extensions import Any
 from .database import SessionLocal
 from .models import Music, init_db
 from .scanner import scan_and_print
+from .config import MUSIC_PATH
 
 # from fastapi.staticfiles import StaticFiles
 
@@ -36,7 +37,7 @@ def root():
 
 @app.post("/api/scan")
 def scan_library():
-    scan_and_print("../library/music")
+    scan_and_print(MUSIC_PATH)
     return {"status": "scan completed"}
 
 

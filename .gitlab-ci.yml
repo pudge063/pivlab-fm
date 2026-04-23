@@ -1,19 +1,36 @@
 stages:
   - jobs
 
-.base_job:
-  tags: [immortal]
-  before_script:
-    - poetry install --no-root && . .venv/bin/activate
+variables:
+  NEXUS_URL: nexus.pivlab.space
+  NEXUS_PORT: 6001
+  BUILDER: custom_builder
+  CI_COMMIT_TAG: 1.0.1
 
-pre-commit:
-  variables:
-    FORCE_COLOR: 1
-    PY_COLORS: 1
-    CLICOLOR_FORCE: 1
-    PRE_COMMIT_COLOR: always
-  image: af.headoffice.pivlab:6005/pre-commit:6.0.0
-  extends: [.base_job]
+.build:
   stage: jobs
+  tags: [ immortal-dood ]
+  before_script:
+    - docker buildx use $BUILDER
   script:
-    - pre-commit run -a -v
+    - |
+      docker buildx b \
+        --provenance=false \
+        --platform linux/amd64 \
+        -f ${COMPONENT}/Dockerfile \
+        -t $NEXUS_URL:$NEXUS_PORT/${COMPONENT}:${CI_COMMIT_TAG:-"$CI_COMMIT_SHA"} \
+        --push ${COMPONENT}/
+  rules:
+    - if: "$CI_COMMIT_TAG"
+    - changes:
+        - $COMPONENT/*
+
+build:fm-client:
+  variables:
+    COMPONENT: fm_client
+  extends: [ .build ]
+
+build:fm-server:
+  variables:
+    COMPONENT: fm_server
+  extends: [ .build ]

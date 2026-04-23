@@ -1,8 +1,10 @@
 document.addEventListener('DOMContentLoaded', async () => {
+    document.getElementById('reloadBtn').addEventListener('click', () => {
+        location.reload();
+    });
+
     const player = new Player();
     let tracks = [];
-
-    let currentCategory = '';
 
     if ('mediaSession' in navigator) {
         navigator.mediaSession.setActionHandler('previoustrack', () => {
@@ -38,39 +40,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    const categoryBtns = document.querySelectorAll('.category-btn');
-
-    // Обработчик для кнопок категорий
-    categoryBtns.forEach(btn => {
-        btn.addEventListener('click', async (e) => {
-            const category = e.target.dataset.category;
-
-            // Обновляем активный класс
-            categoryBtns.forEach(b => b.classList.remove('active'));
-            e.target.classList.add('active');
-
-            // Обновляем текущую категорию
-            currentCategory = category;
-
-            // Перезагружаем список треков
-            if (tracksLoaded) {
-                try {
-                    tracks = await API.getTracks(currentCategory);
-                    UI.renderTracks(tracks, player.currentTrack?.id);
-                    UI.updateTrackCount(tracks.length);
-                } catch (error) {
-                    console.error('Error loading tracks by category:', error);
-                }
-            }
-
-            // Если играет трек - можно оставить как есть, или остановить
-            // Если хотите автоматически переключить на трек из новой категории:
-            // if (player.currentTrack) {
-            //     playNextTrack();
-            // }
-        });
-    });
-
     // load tracks list
     async function loadTracks() {
         try {
@@ -85,7 +54,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // next track
     async function playNextTrack() {
         try {
-            const track = await API.getNextTrack(currentCategory);
+            const track = await API.getNextTrack();
             if (!tracks.find(t => t.id === track.id)) {
                 tracks.push(track);
             }
@@ -179,7 +148,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (isTracksVisible) {
             if (!tracksLoaded) {
                 try {
-                    tracks = await API.getTracks(currentCategory);
+                    tracks = await API.getTracks();
                     UI.renderTracks(tracks, player.currentTrack?.id);
                     UI.updateTrackCount(tracks.length);
                     tracksLoaded = true;
@@ -193,13 +162,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             searchContainer.style.display = 'block';
             footer.style.display = 'block';
             toggleTracksBtn.classList.add('active');
-            toggleTracksBtn.textContent = 'Скрыть список';
+            toggleTracksBtn.textContent = 'Hide playlist';
         } else {
             tracksContainer.style.display = 'none';
             searchContainer.style.display = 'none';
             footer.style.display = 'none';
             toggleTracksBtn.classList.remove('active');
-            toggleTracksBtn.textContent = 'Список треков';
+            toggleTracksBtn.textContent = 'Show playlist';
         }
     });
 

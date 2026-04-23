@@ -1,12 +1,15 @@
 services:
   fm-server:
-    build: .
+    # build:
+    #   context: fm_client
+    #   dockerfile: Dockerfile
+    image: nexus.pivlab.space:6001/fm_server:1.0.1
     container_name: fm-server
     restart: unless-stopped
     volumes:
-      - /pivlab-fm-storage/library:/library
+      - /library:/library
     environment:
-      - MUSIC_PATH=/library/music
+      - MUSIC_PATH=/library/music/
       - DB_PATH=/library/data/music.db
     networks:
       - pivlab-network
@@ -14,15 +17,16 @@ services:
     #   - "8000:8000"
 
   fm-client:
-    build:
-      context: ./fm_client
-      dockerfile: Dockerfile
+    # build:
+    #   context: ./fm_client
+    #   dockerfile: Dockerfile
+    image: nexus.pivlab.space:6001/fm_client:1.0.1
     container_name: fm-client
     restart: unless-stopped
     ports:
       - "80:80"
-    volumes:
-      - ./fm_client/src:/usr/share/nginx/html/static
+    # volumes:
+    #   - ./fm_client/src:/usr/share/nginx/html/static
     depends_on:
       - fm-server
     networks:
