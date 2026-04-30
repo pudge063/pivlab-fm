@@ -37,28 +37,25 @@ build:fm-server:
     PUBLISH_PATH: ${INTERNAL_REGISTRY}/${COMPONENT}
   extends: [ .build ]
 
-build:fm-client-dockerhub:
+.publish-to-dockerhub:
+  extends: [ .build ]
+  rules:
+    - if: "$CI_COMMIT_TAG"
+    - changes:
+        - $COMPONENT/*
   stage: publish-dockerhub
+  when: manual
+
+build:fm-client-dockerhub:
+  extends: [ .publish-to-dockerhub ]
   variables:
     COMPONENT: fm_client
     PUBLISH_PATH: ${EXTERNAL_REGISTRY}/fm-client
-  extends: [ .build ]
-  when: manual
   needs: [ build:fm-client ]
-  rules:
-    - if: "$CI_COMMIT_TAG"
-    - changes:
-        - $COMPONENT/*
 
 build:fm-server-dockerhub:
-  stage: publish-dockerhub
+  extends: [ .publish-to-dockerhub ]
   variables:
     COMPONENT: fm_server
     PUBLISH_PATH: ${EXTERNAL_REGISTRY}/fm-server
-  extends: [ .build ]
-  when: manual
   needs: [ build:fm-server ]
-  rules:
-    - if: "$CI_COMMIT_TAG"
-    - changes:
-        - $COMPONENT/*
