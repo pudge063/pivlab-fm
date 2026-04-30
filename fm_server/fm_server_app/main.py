@@ -2,20 +2,18 @@ import random
 from datetime import datetime
 from pathlib import Path
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Request, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy.orm import Session
 from fastapi.responses import StreamingResponse
 from typing_extensions import Any
 
-from .database import SessionLocal
+from .database import get_db, engine
 from .models import Music, init_db
 from .scanner import scan_and_print
 from .config import MUSIC_PATH
 
-# from fastapi.staticfiles import StaticFiles
-
-
-init_db()
+init_db(engine)
 
 app = FastAPI()
 app.add_middleware(
@@ -26,8 +24,6 @@ app.add_middleware(
 )
 
 unique_counter = 0
-
-# app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
 @app.get("/")
@@ -42,16 +38,14 @@ def scan_library():
 
 
 @app.get("/api/tracks")
-def get_tracks():
-    db = SessionLocal()
+def get_tracks(db: Session = Depends(get_db)):
     tracks = db.query(Music).all()
     db.close()
     return tracks
 
 
 @app.get("/api/stream/{track_id}")
-async def stream_track(track_id: int, request: Request):
-    db = SessionLocal()
+async def stream_track(track_id: int, request: Request, db: Session = Depends(get_db)):
     try:
         track = db.query(Music).filter(Music.id == track_id).first()
 
@@ -125,11 +119,13 @@ async def stream_track(track_id: int, request: Request):
 
 
 @app.get("/api/next")
-def get_next_track(category: str = None) -> dict[str, Any]:
+def get_next_track(
+    category: str = None,
+    db: Session = Depends(get_db),
+) -> dict[str, Any]:
     global unique_counter
     unique_counter += 1
 
-    db = SessionLocal()
     try:
         if unique_counter % 8 == 0 and not category:
             unplayed_tracks: list[Music] = (
@@ -197,8 +193,10 @@ def get_next_track(category: str = None) -> dict[str, Any]:
 
 
 @app.post("/api/tracks/{track_id}/like")
-def like_track(track_id: int) -> dict[str, Any]:
-    db = SessionLocal()
+def like_track(
+    track_id: int,
+    db: Session = Depends(get_db),
+) -> dict[str, Any]:
     try:
         track: Music | None = db.query(Music).filter(Music.id == track_id).first()
         if not track:
@@ -213,8 +211,10 @@ def like_track(track_id: int) -> dict[str, Any]:
 
 
 @app.post("/api/tracks/{track_id}/dislike")
-def dislike_track(track_id: int) -> dict[str, Any]:
-    db = SessionLocal()
+def dislike_track(
+    track_id: int,
+    db: Session = Depends(get_db),
+) -> dict[str, Any]:
     try:
         track = db.query(Music).filter(Music.id == track_id).first()
         if not track:
@@ -229,8 +229,7 @@ def dislike_track(track_id: int) -> dict[str, Any]:
 
 
 @app.get("/api/info")
-def get_info():
-    db = SessionLocal()
+def get_info(db: Session = Depends(get_db)):
     try:
         count = db.query(Music).count()
         return {"tracks_count": count}
