@@ -26,5 +26,5 @@ class Music(Base):
     category: Mapped[Optional[str]] = mapped_column(String, nullable=True)
 
 
-def init_db():
+def init_db(engine):
     Base.metadata.create_all(bind=engine)
