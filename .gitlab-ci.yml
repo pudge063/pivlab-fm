@@ -3,11 +3,9 @@ stages:
   - publish-dockerhub
 
 variables:
-  NEXUS_URL: nexus.pivlab.space
-  NEXUS_PORT: 6001
+  INTERNAL_REGISTRY: nexus.pivlab.space:6001
+  EXTERNAL_REGISTRY: pudge063
   BUILDER: custom_builder
-  CI_COMMIT_TAG: 1.0.1
-  REGISTRY: pudge063
 
 .build:
   stage: publish-internal
@@ -24,36 +22,43 @@ variables:
         -t ${PUBLISH_PATH}:${PUBLISH_TAG} \
         --push ${COMPONENT}/
   rules:
-    - if: "$CI_COMMIT_TAG"
     - changes:
         - $COMPONENT/*
 
 build:fm-client:
   variables:
     COMPONENT: fm_client
-    PUBLISH_PATH: $NEXUS_URL:$NEXUS_PORT/${COMPONENT}
+    PUBLISH_PATH: ${INTERNAL_REGISTRY}/${COMPONENT}
   extends: [ .build ]
 
 build:fm-server:
   variables:
     COMPONENT: fm_server
-    PUBLISH_PATH: $NEXUS_URL:$NEXUS_PORT/${COMPONENT}
+    PUBLISH_PATH: ${INTERNAL_REGISTRY}/${COMPONENT}
   extends: [ .build ]
 
 build:fm-client-dockerhub:
   stage: publish-dockerhub
   variables:
     COMPONENT: fm_client
-    PUBLISH_PATH: $REGISTRY/fm-client
+    PUBLISH_PATH: ${EXTERNAL_REGISTRY}/fm-client
   extends: [ .build ]
   when: manual
   needs: [ build:fm-client ]
+  rules:
+    - if: "$CI_COMMIT_TAG"
+    - changes:
+        - $COMPONENT/*
 
 build:fm-server-dockerhub:
   stage: publish-dockerhub
   variables:
     COMPONENT: fm_server
-    PUBLISH_PATH: $REGISTRY/fm-server
+    PUBLISH_PATH: ${EXTERNAL_REGISTRY}/fm-server
   extends: [ .build ]
   when: manual
   needs: [ build:fm-server ]
+  rules:
+    - if: "$CI_COMMIT_TAG"
+    - changes:
+        - $COMPONENT/*

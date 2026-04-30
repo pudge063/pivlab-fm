@@ -3,9 +3,11 @@ services:
     # build:
     #   context: fm_client
     #   dockerfile: Dockerfile
-    image: nexus.pivlab.space:6001/fm_server:1.0.1
+    image: pudge063/fm-server:1.0.0
     container_name: fm-server
     restart: unless-stopped
+    # MOUNT ON SERVER /library DIR WITH /library/music SUBDIR
+    # OR USE CUSTOM PATH
     volumes:
       - /library:/library
     environment:
@@ -20,11 +22,12 @@ services:
     # build:
     #   context: ./fm_client
     #   dockerfile: Dockerfile
-    image: nexus.pivlab.space:6001/fm_client:1.0.1
+    image: pudge063/fm-client:1.0.0
     container_name: fm-client
     restart: unless-stopped
     ports:
       - "80:80"
+    # USE VOLUMES ONLY FOR LOCAL BUILD
     # volumes:
     #   - ./fm_client/src:/usr/share/nginx/html/static
     depends_on:
