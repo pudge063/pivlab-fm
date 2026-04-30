@@ -1,9 +1,9 @@
 services:
   fm-server:
-    # build:
-    #   context: fm_client
-    #   dockerfile: Dockerfile
-    image: pudge063/fm-server:1.0.0
+    build:
+      context: fm_client
+      dockerfile: Dockerfile
+    # image: pudge063/fm-server:1.0.0
     container_name: fm-server
     restart: unless-stopped
     # MOUNT ON SERVER /library DIR WITH /library/music SUBDIR
