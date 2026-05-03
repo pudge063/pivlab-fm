@@ -40,7 +40,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // load tracks list
     async function loadTracks() {
         try {
             tracks = await API.getTracks();
@@ -51,25 +50,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // next track
-    async function playNextTrack() {
-        try {
-            const track = await API.getNextTrack();
-            if (!tracks.find(t => t.id === track.id)) {
-                tracks.push(track);
-            }
-            await player.playTrack(track);
-        } catch (error) {
-            console.error('Error playing next track:', error);
-        }
-    }
-
-    // listener for player
     player.onTimeUpdate = (currentTime, duration) => {
         UI.updateProgress(currentTime, duration);
     };
-
-    player.onEnded = playNextTrack;
 
     player.onPlayStateChange = (isPlaying) => {
         UI.updatePlayButton(isPlaying);
@@ -82,10 +65,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         UI.setRatingButtonsEnabled(true);
     };
 
-    // listener UI
     UI.elements.playBtn.addEventListener('click', () => {
         if (!player.currentTrack) {
-            playNextTrack();
+            player.playNextTrack();
         } else if (player.isPlaying) {
             player.pause();
         } else {
@@ -93,7 +75,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    UI.elements.nextBtn.addEventListener('click', playNextTrack);
+    UI.elements.nextBtn.addEventListener('click', () => {
+        player.playNextTrack();
+        UI.setRatingButtonsEnabled(true);
+    });
 
     UI.elements.prevBtn.addEventListener('click', () => {
         if (player.currentTrack) {
@@ -172,7 +157,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // search
     searchInput.addEventListener('input', (e) => {
         const searchTerm = e.target.value.toLowerCase();
 
@@ -187,7 +171,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // update rating (like)
     UI.elements.likeBtn.addEventListener('click', async () => {
         if (!player.currentTrack) return;
 
@@ -196,7 +179,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         try {
             const result = await API.likeTrack(player.currentTrack.id);
-            UI.updateRating(result.rating);
+            // UI.updateRating(result.rating);
 
             const trackIndex = tracks.findIndex(t => t.id === result.id);
             if (trackIndex !== -1) {
@@ -207,16 +190,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // update rating (dislike)
     UI.elements.dislikeBtn.addEventListener('click', async () => {
         if (!player.currentTrack) return;
 
         isRatingLocked = true;
-        UI.setRatingButtonsEnabled(false);
+        // UI.setRatingButtonsEnabled(false);
 
         try {
             const result = await API.dislikeTrack(player.currentTrack.id);
-            UI.updateRating(result.rating);
+            // UI.updateRating(result.rating);
 
             const trackIndex = tracks.findIndex(t => t.id === result.id);
             if (trackIndex !== -1) {
@@ -225,9 +207,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         } catch (error) {
             console.error('Error disliking track:', error);
         }
-        playNextTrack();
+        player.playNextTrack();
     });
 
-    // initial tracks load
-    // await loadTracks();
 });

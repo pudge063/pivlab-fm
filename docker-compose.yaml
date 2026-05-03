@@ -1,15 +1,15 @@
 services:
   fm-server:
-    # build:
-    #   context: fm_client
-    #   dockerfile: Dockerfile
-    image: pudge063/fm-server:1.0.1
+    build:
+      context: ./fm_server
+      dockerfile: Dockerfile
+    # image: pudge063/fm-server:1.0.2
     container_name: fm-server
     restart: unless-stopped
     # MOUNT ON SERVER /library DIR WITH /library/music SUBDIR
     # OR USE CUSTOM PATH
     volumes:
-      - /library:/library
+      - ./library:/library
     environment:
       - MUSIC_PATH=/library/music/
       - DB_PATH=/library/data/music.db
@@ -19,17 +19,17 @@ services:
     #   - "8000:8000"
 
   fm-client:
-    # build:
-    #   context: ./fm_client
-    #   dockerfile: Dockerfile
-    image: pudge063/fm-client:1.0.1
+    build:
+      context: ./fm_client
+      dockerfile: Dockerfile
+    # image: pudge063/fm-client:1.0.2
     container_name: fm-client
     restart: unless-stopped
     ports:
       - "80:80"
     # USE VOLUMES ONLY FOR LOCAL BUILD
-    # volumes:
-    #   - ./fm_client/src:/usr/share/nginx/html/static
+    volumes:
+      - ./fm_client/src:/usr/share/nginx/html/static
     depends_on:
       - fm-server
     networks:

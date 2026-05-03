@@ -12,7 +12,6 @@ const UI = {
         scanBtn: document.getElementById('scanBtn'),
         progressBar: document.getElementById('progressBar'),
 
-        // rating
         ratingValue: document.getElementById('ratingValue'),
         likeBtn: document.getElementById('likeBtn'),
         dislikeBtn: document.getElementById('dislikeBtn'),
@@ -32,7 +31,7 @@ const UI = {
                 <div class="track-artist">${track.artist || 'Unknown'}</div>
             `;
         } else {
-            this.elements.trackInfo.innerHTML = '<div class="no-track">Выберите трек</div>';
+            this.elements.trackInfo.innerHTML = '<div class="no-track">No track</div>';
         }
     },
 
