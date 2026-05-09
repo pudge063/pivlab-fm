@@ -21,21 +21,6 @@ body {
     padding: 16px;
 }
 
-.reload-btn {
-    background: #404040;
-    color: #fff;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 16px;
-    cursor: pointer;
-    font-size: 16px;
-    margin-right: 8px;
-}
-
-.reload-btn:hover {
-    background: #4a4a4a;
-}
-
 .player {
     background: #2d2d2d;
     border-radius: 12px;

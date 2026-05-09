@@ -1,7 +1,6 @@
 const UI = {
     elements: {
         trackInfo: document.getElementById('trackInfo'),
-        tracksContainer: document.getElementById('tracksContainer'),
         progressFill: document.getElementById('progressFill'),
         currentTime: document.getElementById('currentTime'),
         duration: document.getElementById('duration'),
@@ -28,16 +27,6 @@ const UI = {
         } else {
             this.elements.trackInfo.innerHTML = '<div class="no-track">No track</div>';
         }
-    },
-
-    renderTracks(tracks, currentTrackId) {
-        this.elements.tracksContainer.innerHTML = tracks.map(track => `
-            <div class="track-item ${currentTrackId === track.id ? 'playing' : ''}"
-                 data-track-id="${track.id}">
-                <span class="track-item-title">${track.artist || 'Unknown'} - ${track.title || 'Unknown'}</span>
-                <span class="track-item-duration">${this.formatTime(track.duration)}</span>
-            </div>
-        `).join('');
     },
 
     updateProgress(currentTime, duration) {

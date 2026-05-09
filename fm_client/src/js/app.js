@@ -1,8 +1,4 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    document.getElementById('reloadBtn').addEventListener('click', () => {
-        location.reload();
-    });
-
     const player = new Player();
     let tracks = [];
 
@@ -27,7 +23,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function loadTracks() {
         try {
             tracks = await API.getTracks();
-            UI.renderTracks(tracks, player.currentTrack?.id);
             UI.updateTrackCount(tracks.length);
         } catch (error) {
             console.error('Error loading tracks:', error);
@@ -45,7 +40,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     player.onTrackChange = (track) => {
         UI.updateTrackInfo(track);
         UI.updateDuration(track.duration);
-        UI.renderTracks(tracks, track.id);
         UI.setButtonsEnabled(true);
     };
 
@@ -61,17 +55,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     UI.elements.nextBtn.addEventListener('click', () => {
         player.playNextTrack();
-    });
-
-    UI.elements.tracksContainer.addEventListener('click', (e) => {
-        const trackItem = e.target.closest('.track-item');
-        if (trackItem) {
-            const trackId = parseInt(trackItem.dataset.trackId);
-            const track = tracks.find(t => t.id === trackId);
-            if (track) {
-                player.playTrack(track);
-            }
-        }
     });
 
     UI.elements.progressBar.addEventListener('click', (e) => {
@@ -92,58 +75,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    const toggleTracksBtn = document.getElementById('toggleTracksBtn');
-    const searchContainer = document.getElementById('searchContainer');
-    const tracksContainer = document.getElementById('tracksContainer');
-    const searchInput = document.getElementById('searchInput');
-    const footer = document.getElementById('footer');
-
-    let isTracksVisible = false;
-    let tracksLoaded = false;
-
-    toggleTracksBtn.addEventListener('click', async () => {
-        isTracksVisible = !isTracksVisible;
-
-        if (isTracksVisible) {
-            if (!tracksLoaded) {
-                try {
-                    tracks = await API.getTracks();
-                    UI.renderTracks(tracks, player.currentTrack?.id);
-                    UI.updateTrackCount(tracks.length);
-                    tracksLoaded = true;
-                } catch (error) {
-                    console.error('Error loading tracks:', error);
-                    tracksContainer.innerHTML = '<div class="error">Ошибка загрузки</div>';
-                }
-            }
-
-            tracksContainer.style.display = 'block';
-            searchContainer.style.display = 'block';
-            footer.style.display = 'block';
-            toggleTracksBtn.classList.add('active');
-            toggleTracksBtn.textContent = 'Hide playlist';
-        } else {
-            tracksContainer.style.display = 'none';
-            searchContainer.style.display = 'none';
-            footer.style.display = 'none';
-            toggleTracksBtn.classList.remove('active');
-            toggleTracksBtn.textContent = 'Show playlist';
-        }
-    });
-
-    searchInput.addEventListener('input', (e) => {
-        const searchTerm = e.target.value.toLowerCase();
-
-        if (searchTerm === '') {
-            UI.renderTracks(tracks, player.currentTrack?.id);
-        } else {
-            const filteredTracks = tracks.filter(track =>
-                (track.title && track.title.toLowerCase().includes(searchTerm)) ||
-                (track.artist && track.artist.toLowerCase().includes(searchTerm))
-            );
-            UI.renderTracks(filteredTracks, player.currentTrack?.id);
-        }
-    });
-
+    loadTracks();
 
 });

@@ -32,8 +32,6 @@ For secure remote access, Pivlab FM should be deployed behind a VPN tunnel. This
 ## Features
 
 - Direct audio streaming in browser
-- Weighted random queue based on rating system
-- Like/dislike influences playback probability
 - Responsive web interface
 - Real-time library search
 - Docker containerization
@@ -71,7 +69,7 @@ The scanner will:
 - Remove entries for deleted files
 - Extract duration and metadata from audio files
 
-## Rating System
+## Rating System (removed in 2.0.0)
 
 The application uses a weighted random selection algorithm where each track's rating influences its playback probability.
 
@@ -154,8 +152,6 @@ pivlab-fm/
 |----------|--------|-------------|------|
 | `/api/tracks` | GET | List all tracks | VPN |
 | `/api/next` | GET | Get next weighted random track | VPN |
-| `/api/tracks/{id}/like` | POST | Increment track rating | VPN |
-| `/api/tracks/{id}/dislike` | POST | Decrement track rating | VPN |
 | `/stream/{id}` | GET | Stream audio file | VPN |
 | `/scan` | POST | Rescan music library | VPN |
 
