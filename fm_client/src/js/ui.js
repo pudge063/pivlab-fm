@@ -7,14 +7,9 @@ const UI = {
         duration: document.getElementById('duration'),
         trackCount: document.getElementById('trackCount'),
         playBtn: document.getElementById('playBtn'),
-        prevBtn: document.getElementById('prevBtn'),
         nextBtn: document.getElementById('nextBtn'),
         scanBtn: document.getElementById('scanBtn'),
         progressBar: document.getElementById('progressBar'),
-
-        ratingValue: document.getElementById('ratingValue'),
-        likeBtn: document.getElementById('likeBtn'),
-        dislikeBtn: document.getElementById('dislikeBtn'),
     },
 
     formatTime(seconds) {
@@ -50,11 +45,11 @@ const UI = {
             const percent = (currentTime / duration) * 100;
             this.elements.progressFill.style.width = Math.min(percent, 100) + '%';
             this.elements.currentTime.textContent = this.formatTime(currentTime);
-
-            if (this.elements.duration.textContent === '0:00') {
-                this.elements.duration.textContent = this.formatTime(duration);
-            }
         }
+    },
+
+    updateDuration(duration) {
+        this.elements.duration.textContent = this.formatTime(duration);
     },
 
     updatePlayButton(isPlaying) {
@@ -62,7 +57,6 @@ const UI = {
     },
 
     setButtonsEnabled(enabled) {
-        this.elements.prevBtn.disabled = !enabled;
         this.elements.nextBtn.disabled = !enabled;
     },
 
@@ -74,12 +68,4 @@ const UI = {
         this.elements.trackCount.textContent = count;
     },
 
-    updateRating(rating) {
-        this.elements.ratingValue.textContent = rating;
-    },
-
-    setRatingButtonsEnabled(enabled) {
-        this.elements.likeBtn.disabled = !enabled;
-        this.elements.dislikeBtn.disabled = !enabled;
-    },
 };

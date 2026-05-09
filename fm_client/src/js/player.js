@@ -65,6 +65,7 @@ class Player {
 
     async playTrack(track) {
         this.currentTrack = track;
+        UI.updateDuration(this.getDuration())
         this.audio.src = API.getStreamUrl(track.id);
 
         try {
@@ -90,6 +91,7 @@ class Player {
         if (this.nextSrc) {
             this.audio.src = this.nextSrc;
             this.currentTrack = this.nextTrack;
+            UI.updateDuration(this.getDuration())
 
             try {
                 this.audio.play();
@@ -120,7 +122,6 @@ class Player {
                 this.audio.play();
                 this.preloadNext();
                 UI.updateTrackInfo(this.currentTrack);
-                UI.setRatingButtonsEnabled(true);
             } catch (error) {
                 console.error('First error on handleEnded next play track', error);
                 setTimeout(() => {

@@ -7,10 +7,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     let tracks = [];
 
     if ('mediaSession' in navigator) {
-        navigator.mediaSession.setActionHandler('previoustrack', () => {
-            document.getElementById('prevBtn').click();
-        });
-
         navigator.mediaSession.setActionHandler('nexttrack', () => {
             document.getElementById('nextBtn').click();
         });
@@ -24,20 +20,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     volumeSlider.addEventListener('input', (e) => {
         const value = e.target.value;
-
         player.setVolume(value);
-
         volumePercent.textContent = value + '%';
-
-        if (value == 0) {
-            volumeIcon.textContent = '🔇';
-        } else if (value < 30) {
-            volumeIcon.textContent = '🔈';
-        } else if (value < 70) {
-            volumeIcon.textContent = '🔉';
-        } else {
-            volumeIcon.textContent = '🔊';
-        }
     });
 
     async function loadTracks() {
@@ -60,9 +44,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     player.onTrackChange = (track) => {
         UI.updateTrackInfo(track);
+        UI.updateDuration(track.duration);
         UI.renderTracks(tracks, track.id);
         UI.setButtonsEnabled(true);
-        UI.setRatingButtonsEnabled(true);
     };
 
     UI.elements.playBtn.addEventListener('click', () => {
@@ -77,14 +61,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     UI.elements.nextBtn.addEventListener('click', () => {
         player.playNextTrack();
-        UI.setRatingButtonsEnabled(true);
-    });
-
-    UI.elements.prevBtn.addEventListener('click', () => {
-        if (player.currentTrack) {
-            player.seek(0);
-            player.resume();
-        }
     });
 
     UI.elements.tracksContainer.addEventListener('click', (e) => {
@@ -124,8 +100,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     let isTracksVisible = false;
     let tracksLoaded = false;
-
-    let isRatingLocked = false;
 
     toggleTracksBtn.addEventListener('click', async () => {
         isTracksVisible = !isTracksVisible;
@@ -171,43 +145,5 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    UI.elements.likeBtn.addEventListener('click', async () => {
-        if (!player.currentTrack) return;
-
-        isRatingLocked = true;
-        UI.setRatingButtonsEnabled(false);
-
-        try {
-            const result = await API.likeTrack(player.currentTrack.id);
-            // UI.updateRating(result.rating);
-
-            const trackIndex = tracks.findIndex(t => t.id === result.id);
-            if (trackIndex !== -1) {
-                tracks[trackIndex].rating = result.rating;
-            }
-        } catch (error) {
-            console.error('Error liking track:', error);
-        }
-    });
-
-    UI.elements.dislikeBtn.addEventListener('click', async () => {
-        if (!player.currentTrack) return;
-
-        isRatingLocked = true;
-        // UI.setRatingButtonsEnabled(false);
-
-        try {
-            const result = await API.dislikeTrack(player.currentTrack.id);
-            // UI.updateRating(result.rating);
-
-            const trackIndex = tracks.findIndex(t => t.id === result.id);
-            if (trackIndex !== -1) {
-                tracks[trackIndex].rating = result.rating;
-            }
-        } catch (error) {
-            console.error('Error disliking track:', error);
-        }
-        player.playNextTrack();
-    });
 
 });

@@ -1,10 +1,11 @@
 import random
-from datetime import datetime
+from datetime import datetime, UTC
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Request, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
+from sqlalchemy import asc, nullsfirst
 from fastapi.responses import StreamingResponse
 from typing_extensions import Any
 
@@ -22,8 +23,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-unique_counter = 0
 
 
 @app.get("/")
@@ -119,113 +118,30 @@ async def stream_track(track_id: int, request: Request, db: Session = Depends(ge
 
 
 @app.get("/api/next")
-def get_next_track(
-    category: str = None,
-    db: Session = Depends(get_db),
-) -> dict[str, Any]:
-    global unique_counter
-    unique_counter += 1
+def get_next_track(db: Session = Depends(get_db)) -> dict[str, Any]:
+    pool = db.query(Music).order_by(nullsfirst(Music.last_played.asc())).limit(20).all()
 
-    try:
-        if unique_counter % 8 == 0 and not category:
-            unplayed_tracks: list[Music] = (
-                db.query(Music).filter(Music.last_played.is_(None)).all()
-            )
+    if not pool:
+        raise HTTPException(
+            status_code=404, detail="No tracks found. Please scan library first."
+        )
 
-            if unplayed_tracks:
-                tracks = unplayed_tracks
-            else:
-                tracks = db.query(Music).all()
-        else:
-            tracks = (
-                db.query(Music).all()
-                if not category
-                else db.query(Music).filter(Music.category == category).all()
-            )
+    track: Music = random.choice(pool)
 
-        if not tracks:
-            raise HTTPException(
-                status_code=404, detail="No tracks found. Please scan library first."
-            )
+    track.last_played = datetime.now(UTC)
+    track.play_count += 1
+    db.commit()
+    db.refresh(track)
 
-        if len(tracks) == 1:
-            track = tracks[0]
-        else:
-            # sorting by last_played (oldest - first)
-            # never played tracks (last_played = None) on list start
-            sorted_tracks = sorted(tracks, key=lambda t: t.last_played or datetime.min)
-
-            available_tracks: list[Music] = sorted_tracks[:-1]
-
-            weights: list[float] = []
-
-            for track in available_tracks:
-                # weight = 1 + (rating/10). rating from -10 to 10
-                # minimal weight 0.1 for very low raiting
-                weight: float = 1 + (track.rating / 10)
-                if weight <= 0:
-                    weight = 0.1  # non zero weight
-                weights.append(weight)
-            track = random.choices(available_tracks, weights=weights)[0]
-
-        # track: Music = random.choice(tracks)  # type: ignore
-
-        if track.play_count == 0:
-            unique_counter = 0
-
-        track.play_count = (track.play_count or 0) + 1
-        track.last_played = datetime.now()
-
-        db.commit()
-        db.refresh(track)
-
-        return {
-            "id": track.id,
-            "title": track.title,
-            "artist": track.artist,
-            "duration": track.duration,
-            "play_count": track.play_count,
-            "last_played": track.last_played.isoformat() if track.last_played else None,  # type: ignore
-            "rating": track.rating or 0,
-        }
-    finally:
-        db.close()
-
-
-@app.post("/api/tracks/{track_id}/like")
-def like_track(
-    track_id: int,
-    db: Session = Depends(get_db),
-) -> dict[str, Any]:
-    try:
-        track: Music | None = db.query(Music).filter(Music.id == track_id).first()
-        if not track:
-            raise HTTPException(status_code=404, detail="Track not found")
-
-        track.rating += 1 if track.rating < 10 else 0  # type: ignore
-        db.commit()
-
-        return {"id": track.id, "rating": track.rating, "action": "like"}
-    finally:
-        db.close()
-
-
-@app.post("/api/tracks/{track_id}/dislike")
-def dislike_track(
-    track_id: int,
-    db: Session = Depends(get_db),
-) -> dict[str, Any]:
-    try:
-        track = db.query(Music).filter(Music.id == track_id).first()
-        if not track:
-            raise HTTPException(status_code=404, detail="Track not found")
-
-        track.rating -= 1 if track.rating > -10 else 0  # type: ignore
-        db.commit()
-
-        return {"id": track.id, "rating": track.rating, "action": "dislike"}
-    finally:
-        db.close()
+    return {
+        "id": track.id,
+        "title": track.title,
+        "artist": track.artist,
+        "duration": track.duration,
+        "play_count": track.play_count,
+        "last_played": track.last_played.isoformat() if track.last_played else None,
+        "rating": track.rating or 0,
+    }
 
 
 @app.get("/api/info")

@@ -23,19 +23,4 @@ const API = {
         return `/api/stream/${trackId}`;
     },
 
-    async likeTrack(trackId) {
-        const response = await fetch(`/api/tracks/${trackId}/like`, {
-            method: 'POST'
-        });
-        if (!response.ok) throw new Error('Failed to like track');
-        return await response.json();
-    },
-
-    async dislikeTrack(trackId) {
-        const response = await fetch(`/api/tracks/${trackId}/dislike`, {
-            method: 'POST'
-        });
-        if (!response.ok) throw new Error('Failed to dislike track');
-        return await response.json();
-    },
 };
