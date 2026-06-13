@@ -119,13 +119,14 @@ async def stream_track(track_id: int, request: Request, db: Session = Depends(ge
 
 @app.get("/api/next")
 def get_next_track(db: Session = Depends(get_db)) -> dict[str, Any]:
-    pool = db.query(Music).order_by(nullsfirst(Music.last_played.asc())).limit(20).all()
+    # pool = db.query(Music).order_by(nullsfirst(Music.last_played.asc())).limit(20).all()
 
-    if not pool:
-        raise HTTPException(
-            status_code=404, detail="No tracks found. Please scan library first."
-        )
+    # if not pool:
+    #     raise HTTPException(
+    #         status_code=404, detail="No tracks found. Please scan library first."
+    #     )
 
+    pool = db.query(Music)
     track: Music = random.choice(pool)
 
     track.last_played = datetime.now(UTC)
