@@ -1,9 +1,9 @@
 services:
   fm-server:
-    # build:
-    #   context: ./fm_server
-    #   dockerfile: Dockerfile
-    image: pudge063/fm-server:2.0.1
+    build:
+      context: ./fm_server
+      dockerfile: Dockerfile
+    # image: pudge063/fm-server:2.0.1
     container_name: fm-server
     restart: unless-stopped
     # MOUNT ON SERVER /library DIR WITH /library/music SUBDIR
@@ -19,10 +19,10 @@ services:
     #   - "8000:8000"
 
   fm-client:
-    # build:
-    #   context: ./fm_client
-    #   dockerfile: Dockerfile
-    image: pudge063/fm-client:2.0.1
+    build:
+      context: ./fm_client
+      dockerfile: Dockerfile
+    # image: pudge063/fm-client:2.0.1
     container_name: fm-client
     restart: unless-stopped
     ports:
